@@ -5,9 +5,9 @@ CC = /usr/local/i386elfgcc/bin/i386-elf-gcc
 GDB = /usr/local/i386elfgcc/bin/i386-elf-gdb
 CFLAGS = -g
 
-C_SOURCE = $(wildcard kernel/*.c drivers/*.c)
-C_HEADERS = $(wildcard kernel/*.h drivers/*.h)
-C_OBJ = ${C_SOURCE:.c=.o}
+C_SOURCE = $(wildcard kernel/*.c drivers/*.c arch/x86/*.c)
+C_HEADERS = $(wildcard kernel/*.h drivers/*.h arch/x86/*.h)
+C_OBJ = ${C_SOURCE:.c=.o arch/x86/interrupt.o}
 
 all: run
 
