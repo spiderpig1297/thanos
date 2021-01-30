@@ -11,36 +11,37 @@ C_OBJ = ${C_SOURCE:.c=.o}
 
 all: run
 
-os-image.bin: boot/boot_sect_main.bin kernel.bin 
+os-image.bin: boot/bootsect.bin kernel.bin 
 	cat $^ > $@
 
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
 kernel.bin: boot/kernel_entry.o ${C_OBJ}
-	$(LD) -o $@ -Ttext 0x1000 $^ --oformat binary
+	${LD} -o $@ -Ttext 0x1000 $^ --oformat binary
 
 # Used for debugging purposes
 kernel.elf: boot/kernel_entry.o ${C_OBJ}
-	$(LD) -o $@ -Ttext 0x1000 $^
+	${LD} -o $@ -Ttext 0x1000 $^
 
 run: os-image.bin
-	$(QEMU) -fda $<
+	${QEMU} -fda $<
 
 debug: os-image.bin kernel.elf
-	$(QEMU) -s -fda $< &
+	${QEMU} -s -fda $< &
 	${GDB} -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
+	kill `pidof ${QEMU}`
 
 %.o : %.c ${C_HEADERS}
-	$(CC) -ffreestanding -c $< -o $@
+	${CC} ${CFLAGS} -DDEBUG -ffreestanding -c $< -o $@
 
 %.o : %.asm
-	$(NASM) $< -f elf -o $@
+	${NASM} $< -f elf -o $@
 
 %.bin : %.asm
-	$(NASM) $< -f bin -I '../../16bit/' -o $@
+	${NASM} $< -f bin -I '../../16bit/' -o $@
 	
 kernel_entry.o: kernel_entry.asm
-	$(NASM) $< -f elf -o $@
+	${NASM} $< -f elf -o $@
 
 clean:
 	rm -rf *.bin *.dis *.o os-image.bin *.elf
