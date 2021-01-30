@@ -44,5 +44,5 @@ kernel_entry.o: kernel_entry.asm
 	${NASM} $< -f elf -o $@
 
 clean:
-	rm -rf *.bin *.dis *.o os-image.bin *.elf
+	rm -rf *.bin *.dis *.o os-image* *.elf
 	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o
