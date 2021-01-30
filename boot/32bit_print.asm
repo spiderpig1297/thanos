@@ -9,9 +9,10 @@ print_string_pm:
 
     mov edx, VIDEO_MEMORY
 
+    mov ah, WHITE_ON_BLACK  ; Store the character attributes
+    
 iterate_string_pm:
     mov al, [ebx]   
-    mov ah, WHITE_ON_BLACK  ; Store the character attributes
 
     cmp al, 0       ; If we have reached the end, finish.
     je end_print_string_pm

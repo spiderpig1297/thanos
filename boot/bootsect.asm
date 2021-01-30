@@ -15,12 +15,11 @@ call switch_to_pm
 
 jmp $
 
-%include "boot/boot_sect_print.asm"
-%include "boot/boot_sect_print_hex.asm"
-%include "boot/boot_sect_disk.asm"
-%include "boot/boot_sect_gdt_def.asm"
-%include "boot/boot_sect_pm_switch.asm"
-%include "boot/boot_sect_pm_print.asm"
+%include "boot/16bit_print.asm"
+%include "boot/32bit_print.asm"
+%include "boot/disk.asm"
+%include "boot/gdt.asm"
+%include "boot/switch_pm.asm"
 
 [bits 16]
 
@@ -31,7 +30,7 @@ load_kernel:
     call print_string
 
     mov bx, KERNEL_OFFSET
-    mov dh, 2
+    mov dh, 32
     mov dl, [BOOT_DRIVE]
     call disk_load
     
