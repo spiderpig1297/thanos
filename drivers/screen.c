@@ -8,6 +8,7 @@
 #define MAX_ROWS (25)
 #define MAX_COL (80)
 #define WHITE_ON_BLACK (0x0f)
+#define RED_ON_BLACK (0xf4)
 
 #define REG_SCREEN_CTRL (0x3d4)
 #define REG_SCREEN_DATA (0x3d5)
@@ -32,27 +33,17 @@ screen_offset_t _handle_scrolling();
 
 void kprint_at(const uint8_t* message, int32_t col, int32_t row)
 {
-    screen_offset_t offset = 0;
-    if (col >= 0 && row >= 0) {
-        offset = _get_offset(row, col);
-    } else {
-        offset = _get_cursor_offset();
-        col = _get_offset_col(offset);
-        row = _get_offset_row(offset);
-    }
-
-    uint32_t i = 0;
-    while (0x00 != message[i]) {
-        offset = _print_char(message[i], col, row, WHITE_ON_BLACK);
-        col = _get_offset_col(offset);
-        row = _get_offset_row(offset);
-        ++i;
-    }
-}   
+    _kprint_at(message, col, row, WHITE_ON_BLACK);
+}  
 
 void kprint(const uint8_t* message) 
 {
     kprint_at(message, -1, -1);
+}
+
+void kprint_err(const uint8_t* message)
+{
+    _kprint_at(message, -1, -1, RED_ON_BLACK);
 }
 
 void kclear_screen()
@@ -69,6 +60,26 @@ void kclear_screen()
 }
 
 /*** Private helper functions ***/
+
+void _kprint_at(const uint8_t* message, int32_t col, int32_t row, uint8_t attributes)
+{
+    screen_offset_t offset = 0;
+    if (col >= 0 && row >= 0) {
+        offset = _get_offset(row, col);
+    } else {
+        offset = _get_cursor_offset();
+        col = _get_offset_col(offset);
+        row = _get_offset_row(offset);
+    }
+
+    uint32_t i = 0;
+    while (0x00 != message[i]) {
+        offset = _print_char(message[i], col, row, attributes);
+        col = _get_offset_col(offset);
+        row = _get_offset_row(offset);
+        ++i;
+    }
+} 
 
 uint32_t _print_char(uint8_t character, uint32_t col, uint32_t row, uint8_t attributes)
 {
