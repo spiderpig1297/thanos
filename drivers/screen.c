@@ -17,20 +17,20 @@
 
 #define NEWLINE_CHARACTER ('\n') 
 
-typedef int screen_offset_t;
+typedef uint32_t screen_offset_t;
 
 /* Declaration of private functions */
-screen_offset_t _print_char(char character, int col, int row, char attributes);
+screen_offset_t _print_char(uint8_t character, uint32_t col, uint32_t row, uint8_t attributes);
 screen_offset_t _get_cursor_offset();
 void _set_cursor_offset(screen_offset_t offset);
-screen_offset_t _get_offset(int row, int col);
-screen_offset_t _get_offset_row(int offset);
-screen_offset_t _get_offset_col(int offset);
+screen_offset_t _get_offset(uint32_t row, uint32_t col);
+screen_offset_t _get_offset_row(uint32_t offset);
+screen_offset_t _get_offset_col(uint32_t offset);
 screen_offset_t _handle_scrolling();
 
 /*** Public kernel API ***/
 
-void kprint_at(const char* message, int col, int row)
+void kprint_at(const uint8_t* message, int32_t col, int32_t row)
 {
     screen_offset_t offset = 0;
     if (col >= 0 && row >= 0) {
@@ -41,7 +41,7 @@ void kprint_at(const char* message, int col, int row)
         row = _get_offset_row(offset);
     }
 
-    int i = 0;
+    uint32_t i = 0;
     while (0x00 != message[i]) {
         offset = _print_char(message[i], col, row, WHITE_ON_BLACK);
         col = _get_offset_col(offset);
@@ -50,14 +50,14 @@ void kprint_at(const char* message, int col, int row)
     }
 }   
 
-void kprint(const char* message) 
+void kprint(const uint8_t* message) 
 {
     kprint_at(message, -1, -1);
 }
 
 void kclear_screen()
 {
-    int row = 0, col = 0;
+    uint32_t row = 0, col = 0;
 
     for (row = 0; row < MAX_ROWS; ++row) {
         for (col = 0; col < MAX_COL; ++col) {
@@ -70,9 +70,9 @@ void kclear_screen()
 
 /*** Private helper functions ***/
 
-int _print_char(char character, int col, int row, char attributes)
+uint32_t _print_char(uint8_t character, uint32_t col, uint32_t row, uint8_t attributes)
 {
-    unsigned char* video_memory = (unsigned char*) VIDEO_CONTROLLER_ADDRESS;
+    uint8_t* video_memory = (uint8_t*) VIDEO_CONTROLLER_ADDRESS;
 
     // If no attributes specified, use default.
     if (!attributes) {
@@ -107,7 +107,7 @@ int _print_char(char character, int col, int row, char attributes)
 
 screen_offset_t _handle_scrolling(screen_offset_t offset)
 {
-    int i = 1;  // Must start with the first row
+    uint32_t i = 1;  // Must start with the first row
     for (i; i < MAX_ROWS; ++i) {
         memory_copy(VIDEO_CONTROLLER_ADDRESS + _get_offset(i, 0),
                     VIDEO_CONTROLLER_ADDRESS + _get_offset(i - 1, 0),
@@ -115,7 +115,7 @@ screen_offset_t _handle_scrolling(screen_offset_t offset)
     }
 
     // Since each row was predecessed by its following, we need to blank the last row.
-    char* last_row = VIDEO_CONTROLLER_ADDRESS + _get_offset(MAX_ROWS - 1, 0);
+    uint8_t* last_row = VIDEO_CONTROLLER_ADDRESS + _get_offset(MAX_ROWS - 1, 0);
     for (i = 0; i < MAX_COL * 2; ++i) {
         last_row[i] = 0;
     }
@@ -123,7 +123,7 @@ screen_offset_t _handle_scrolling(screen_offset_t offset)
     return offset - 2 * MAX_COL;
 }
 
-int _get_cursor_offset() 
+uint32_t _get_cursor_offset() 
 {
     // Use VGA ports to read current cursor offset.
     // 14 (DATA_REG_REQUEST_HIGH_BYTE_CODE) asks for the high byte of the cursor offset.
@@ -140,11 +140,11 @@ void _set_cursor_offset(screen_offset_t offset)
     // Similar to get_cursor_offset, but instead of reading from the port, we will write to it.
     offset = offset / 2;
     port_byte_out(REG_SCREEN_CTRL, DATA_REG_REQUEST_HIGH_BYTE_CODE);
-    port_byte_out(REG_SCREEN_DATA, (unsigned char)(offset >> 8));
+    port_byte_out(REG_SCREEN_DATA, (uint8_t)(offset >> 8));
     port_byte_out(REG_SCREEN_CTRL, DATA_REG_REQUEST_LOW_BYTE_CODE);
-    port_byte_out(REG_SCREEN_DATA, (unsigned char)(offset & 0xFF));
+    port_byte_out(REG_SCREEN_DATA, (uint8_t)(offset & 0xFF));
 }
 
-screen_offset_t _get_offset(int row, int col) { return 2 * (row * MAX_COL + col); }
+screen_offset_t _get_offset(uint32_t row, uint32_t col) { return 2 * (row * MAX_COL + col); }
 screen_offset_t _get_offset_row(screen_offset_t offset) { return (offset / (2 * MAX_COL)); }
 screen_offset_t _get_offset_col(screen_offset_t offset) { return (offset - (_get_offset_row(offset) * 2 * MAX_COL)) / 2; }

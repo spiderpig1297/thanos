@@ -1,5 +1,7 @@
 #pragma once
 
-void kprint_at(const char* message, int col, int row);
-void kprint(const char* message);
+#include "../kernel/arch/x86/common.h"
+
+void kprint_at(const uint8_t* message, int32_t col, int32_t row);
+void kprint(const uint8_t* message);
 void kclear_screen();
