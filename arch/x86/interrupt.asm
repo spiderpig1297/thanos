@@ -31,11 +31,11 @@ isr_common_stub:
     iret        ; Pop CS, EIP, EFLAGS, SS and ESP which were pushed automatically 
                 ; by the CPU when the interrupt was fired.
 
-global isr0
-global isr1
-global isr2
-global isr3
-global isr4
+global isr_divide_by_zero
+global isr_debug
+global isr_nmi
+global isr_breakpoint
+global isr_overflow
 global isr5
 global isr6
 global isr7
@@ -65,35 +65,35 @@ global isr30
 global isr31
 
 ; 0: Divide By Zero Exception
-isr0:
+isr_divide_by_zero:
     cli
     push byte 0
     push byte 0
     jmp isr_common_stub
 
 ; 1: Debug Exception
-isr1:
+isr_debug:
     cli
     push byte 0
     push byte 1
     jmp isr_common_stub
 
 ; 2: Non Maskable Interrupt Exception
-isr2:
+isr_nmi:
     cli
     push byte 0
     push byte 2
     jmp isr_common_stub
 
 ; 3: Int 3 Exception
-isr3:
+isr_breakpoint:
     cli
     push byte 0
     push byte 3
     jmp isr_common_stub
 
 ; 4: INTO Exception
-isr4:
+isr_overflow:
     cli
     push byte 0
     push byte 4
