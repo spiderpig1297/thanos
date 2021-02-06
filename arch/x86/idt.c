@@ -1,14 +1,13 @@
 #pragma once
 
 #include "types.h"
-#include "traps.h"
 #include "idt.h"
 #include "../../drivers/screen.h"
 #include "../../kernel/util.h"
 
 void set_idt_descriptor()
 {
-    idt_descriptor.limit = sizeof(idt_gate_t) * NR_INTERRUPTS - 1;
+    idt_descriptor.limit = sizeof(idt_gate_t) * IDT_ENTRIES - 1;
     idt_descriptor.base = (uint32_t)&idt_gates;
 
     // mmzero(&idt_gates, sizeof(idt_gate_t) * NR_INTERRUPTS);
@@ -18,31 +17,37 @@ void set_idt_descriptor()
 
 void _set_idt_gate(uint32_t num, uint8_t type, uint8_t dpl, uint32_t handler, uint8_t selector)
 {
-    idt_gates[num].callback_low_byte = byte_low_16(handler);
-    idt_gates[num].seg_selector = selector;
-    idt_gates[num].zero = 0;
-    idt_gates[num].flags = ((0x80 + type) + (dpl << 5));
-    idt_gates[num].callback_high_byte = byte_high_16(handler);
+    idt_gate_t data;
+    memzero(&data, sizeof(data));
+
+    data.callback_low_byte = byte_low_16(handler);
+    data.seg_selector = selector;
+    data.flags.dpl = dpl;
+    data.flags.type = type;
+    data.flags.p = 1;
+    data.callback_high_byte = byte_high_16(handler);
+
+    memcopy(&data, &idt_gates[num], sizeof(data));
 }
 
 void set_trap_gate(uint32_t num, uint32_t handler)
 {
-    _set_idt_gate(num, GATE_TYPE_TRAP, PRIVILEGE_HIGH, handler, KERNEL_CS);
+    _set_idt_gate(num, GATE_TYPE_TRAP, DPL0, handler, KERNEL_CS);
 }
 
 void set_interrupt_gate(uint32_t num, uint32_t handler)
 {
-    _set_idt_gate(num, GATE_TYPE_INTERRUPT, PRIVILEGE_HIGH, handler, KERNEL_CS);
+    _set_idt_gate(num, GATE_TYPE_INTERRUPT, DPL0, handler, KERNEL_CS);
 }
 
 void set_system_trap_gate(uint32_t num, uint32_t handler)
 {
-    _set_idt_gate(num, GATE_TYPE_TRAP, PRIVILEGE_LOW, handler, KERNEL_CS);
+    _set_idt_gate(num, GATE_TYPE_TRAP, DPL3, handler, KERNEL_CS);
 }
 
 void set_system_interrupt_gate(uint32_t num, uint32_t handler)
 {
-    _set_idt_gate(num, GATE_TYPE_INTERRUPT, PRIVILEGE_LOW, handler, KERNEL_CS);
+    _set_idt_gate(num, GATE_TYPE_INTERRUPT, DPL3, handler, KERNEL_CS);
 }
 
 void init_traps()

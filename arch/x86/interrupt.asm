@@ -119,13 +119,13 @@ isr_device_not_available:
     jmp isr_common_stub
 
 ; 8: Double Fault
-; #DF, Abort, Built-in error code.
+; #DF, Abort, Built-in error code (0)
 isr_double_fault:
     cli
     push byte 8
     jmp isr_common_stub
 
-; 9: Coprocessor Segment Overrun.
+; 9: Coprocessor Segment Overrun
 ; N/a, Fault
 isr_segment_overrun:
     cli
@@ -134,7 +134,7 @@ isr_segment_overrun:
     jmp isr_common_stub
 
 ; 10: Invalid TSS
-; #TS, Fault, Built-in error code.
+; #TS, Fault, Built-in error code
 isr_invalid_tss:
     cli
     push byte 10
@@ -184,7 +184,7 @@ isr_fpe:
     jmp isr_common_stub
 
 ; 17: Alignment Check
-; #AC, Fault
+; #AC, Fault, Built-in error code (0)
 isr_alignment_check:
     cli
     push byte 0
