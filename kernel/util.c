@@ -1,6 +1,6 @@
 #include "util.h"
 
-void mmcopy(const uint8_t* source, uint8_t* dest, uint32_t nbytes)
+void memcopy(const uint8_t* source, uint8_t* dest, uint32_t nbytes)
 {
     // TODO: check for nullity
     int i = 0;
@@ -9,7 +9,7 @@ void mmcopy(const uint8_t* source, uint8_t* dest, uint32_t nbytes)
     }
 }
 
-void mmset(uint8_t* source, uint8_t value, uint32_t length)
+void memset(uint8_t* source, uint8_t value, uint32_t length)
 {
     int i = 0;
     for (i; i < length; ++i) {
@@ -17,9 +17,9 @@ void mmset(uint8_t* source, uint8_t value, uint32_t length)
     }
 }
 
-void mmzero(uint8_t* source, uint32_t length)
+void memzero(uint8_t* source, uint32_t length)
 {
-    mmset(source, 0x00, length);
+    memset(source, 0x00, length);
 }
 
 void int_to_ascii(uint32_t n, uint8_t* result)
