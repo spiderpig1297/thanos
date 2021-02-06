@@ -4,6 +4,12 @@
 
 #define KERNEL_CS (0x08)
 
+#define GATE_TYPE_INTERRUPT (14)
+#define GATE_TYPE_TRAP (15)
+
+#define PRIVILEGE_HIGH (0)
+#define PRIVILEGE_LOW (3)
+
 #define NR_INTERRUPTS (256)
 
 // Describes an interrupt handler.
@@ -31,6 +37,3 @@ typedef struct
 
 idt_gate_t idt_gates[NR_INTERRUPTS];
 idt_descriptor_t idt_descriptor;
-
-void set_idt_descriptor();
-void set_idt_gate(uint32_t num, uint32_t handler);
