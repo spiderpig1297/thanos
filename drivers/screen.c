@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ports.h"
+#include "../arch/x86/io.h"
 #include "screen.h"
 #include "../kernel/util.h"
 
@@ -139,10 +139,10 @@ uint32_t _get_cursor_offset()
     // Use VGA ports to read current cursor offset.
     // 14 (DATA_REG_REQUEST_HIGH_BYTE_CODE) asks for the high byte of the cursor offset.
     // 15 (DATA_REG_REQUEST_LOW_BYTE_CODE) asks for the lower byte of the cursor offset.
-    port_byte_out(REG_SCREEN_CTRL, DATA_REG_REQUEST_HIGH_BYTE_CODE);
-    screen_offset_t offset = port_byte_in(REG_SCREEN_DATA) << 8;
-    port_byte_out(REG_SCREEN_CTRL, DATA_REG_REQUEST_LOW_BYTE_CODE);
-    offset += port_byte_in(REG_SCREEN_DATA);
+    outb(REG_SCREEN_CTRL, DATA_REG_REQUEST_HIGH_BYTE_CODE);
+    screen_offset_t offset = inb(REG_SCREEN_DATA) << 8;
+    outb(REG_SCREEN_CTRL, DATA_REG_REQUEST_LOW_BYTE_CODE);
+    offset += inb(REG_SCREEN_DATA);
     return offset * 2;
 }
 
@@ -150,10 +150,10 @@ void _set_cursor_offset(screen_offset_t offset)
 {
     // Similar to get_cursor_offset, but instead of reading from the port, we will write to it.
     offset = offset / 2;
-    port_byte_out(REG_SCREEN_CTRL, DATA_REG_REQUEST_HIGH_BYTE_CODE);
-    port_byte_out(REG_SCREEN_DATA, (uint8_t)(offset >> 8));
-    port_byte_out(REG_SCREEN_CTRL, DATA_REG_REQUEST_LOW_BYTE_CODE);
-    port_byte_out(REG_SCREEN_DATA, (uint8_t)(offset & 0xFF));
+    outb(REG_SCREEN_CTRL, DATA_REG_REQUEST_HIGH_BYTE_CODE);
+    outb(REG_SCREEN_DATA, (uint8_t)(offset >> 8));
+    outb(REG_SCREEN_CTRL, DATA_REG_REQUEST_LOW_BYTE_CODE);
+    outb(REG_SCREEN_DATA, (uint8_t)(offset & 0xFF));
 }
 
 screen_offset_t _get_offset(uint32_t row, uint32_t col) { return 2 * (row * MAX_COL + col); }
