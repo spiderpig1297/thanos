@@ -9,10 +9,6 @@ C_SOURCE = $(wildcard kernel/*.c drivers/*.c arch/x86/*.c)
 C_HEADERS = $(wildcard kernel/*.h drivers/*.h arch/x86/*.h)
 C_OBJ = ${C_SOURCE:.c=.o arch/x86/interrupt.o}
 
-${info	VAR is ${C_SOURCE}}
-${info	VAR is ${C_HEADERS}}
-${info	VAR is ${C_OBJ}}
-
 all: run
 
 os-image.bin: boot/bootsect.bin kernel.bin 
@@ -36,17 +32,12 @@ debug: os-image.bin kernel.elf
 	kill `pidof ${QEMU}`
 
 %.o : %.c ${C_HEADERS}
-	${info	Building $< to $@... }
 	${CC} ${CFLAGS} -DDEBUG -ffreestanding -c $< -o $@
 
 %.o : %.asm
-	${info	Building $< to $@... }
-
 	${NASM} $< -f elf -o $@
 
 %.bin : %.asm
-	${info	Building $< to $@... }
-
 	${NASM} $< -f bin -I '../../16bit/' -o $@
 	
 kernel_entry.o: kernel_entry.asm
@@ -54,4 +45,4 @@ kernel_entry.o: kernel_entry.asm
 
 clean:
 	rm -rf *.bin *.dis *.o os-image* *.elf
-	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o
+	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o arch/x86/*.o
