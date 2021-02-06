@@ -59,7 +59,7 @@ irq_common_stub:
     sti         ; Set Interrupt Flag instruction
     iret        ; Pop CS, EIP, EFLAGS, SS and ESP which were pushed automatically 
                 ; by the CPU when the interrupt was fired.
-
+                
 
 ; 0: Divide By Zero
 ; #DE, Fault
