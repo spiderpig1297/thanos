@@ -120,9 +120,9 @@ screen_offset_t _handle_scrolling(screen_offset_t offset)
 {
     uint32_t i = 1;  // Must start with the first row
     for (i; i < MAX_ROWS; ++i) {
-        memory_copy(VIDEO_CONTROLLER_ADDRESS + _get_offset(i, 0),
-                    VIDEO_CONTROLLER_ADDRESS + _get_offset(i - 1, 0),
-                    MAX_COL * 2);
+        mmcopy( VIDEO_CONTROLLER_ADDRESS + _get_offset(i, 0),
+                VIDEO_CONTROLLER_ADDRESS + _get_offset(i - 1, 0),
+                    MAX_COL * 2 );
     }
 
     // Since each row was predecessed by its following, we need to blank the last row.
