@@ -1,7 +1,7 @@
 #pragma once
 
-#include "types.h"
 #include "idt.h"
+#include "isr.h"
 #include "../../drivers/screen.h"
 #include "../../kernel/util.h"
 
@@ -9,8 +9,6 @@ void set_idt_descriptor()
 {
     idt_descriptor.limit = sizeof(idt_gate_t) * IDT_ENTRIES - 1;
     idt_descriptor.base = (uint32_t)&idt_gates;
-
-    // mmzero(&idt_gates, sizeof(idt_gate_t) * NR_INTERRUPTS);
 
     __asm__ __volatile__("lidtl (%0)" : : "r" (&idt_descriptor));
 }
@@ -50,77 +48,48 @@ void set_system_interrupt_gate(uint32_t num, uint32_t handler)
     _set_idt_gate(num, GATE_TYPE_INTERRUPT, DPL3, handler, KERNEL_CS);
 }
 
-void init_traps()
+void init_idt()
 {
-    set_interrupt_gate(0, (uint32_t)isr_divide_by_zero);
-    set_interrupt_gate(1, (uint32_t)isr_debug);
-    set_interrupt_gate(2, (uint32_t)isr_nmi);
-    set_system_interrupt_gate(3, (uint32_t)isr_breakpoint);
-    set_system_interrupt_gate(4, (uint32_t)isr_overflow);
-    set_interrupt_gate(5, (uint32_t)isr_boundrange);
-    set_interrupt_gate(6, (uint32_t)isr_invalid_opcode);
-    set_interrupt_gate(7, (uint32_t)isr_device_not_available);
-    set_interrupt_gate(8, (uint32_t)isr_double_fault);
-    set_interrupt_gate(9, (uint32_t)isr_segment_overrun);
-    set_interrupt_gate(10, (uint32_t)isr_invalid_tss);
-    set_interrupt_gate(11, (uint32_t)isr_segment_not_present);
-    set_interrupt_gate(12, (uint32_t)isr_stack_segment_fault);
-    set_interrupt_gate(13, (uint32_t)isr_general_protection);
-    set_interrupt_gate(14, (uint32_t)isr_page_fault);
-    set_interrupt_gate(15, (uint32_t)isr_reserved_15);
-    set_interrupt_gate(16, (uint32_t)isr_fpe);
-    set_interrupt_gate(17, (uint32_t)isr_alignment_check);
-    set_interrupt_gate(18, (uint32_t)isr_machine_check);
-    set_interrupt_gate(19, (uint32_t)isr_simd_fpe);
-    set_interrupt_gate(20, (uint32_t)isr_virtualization_error);
-    set_system_interrupt_gate(21, (uint32_t)isr_syscall);
+    /* CPU interrupts */
+    set_interrupt_gate(X86_TRAP_DE, (uint32_t)isr_divide_by_zero);
+    set_interrupt_gate(X86_TRAP_DB, (uint32_t)isr_debug);
+    set_interrupt_gate(X86_TRAP_NMI, (uint32_t)isr_nmi);
+    set_system_interrupt_gate(X86_TRAP_BP, (uint32_t)isr_breakpoint);
+    set_system_interrupt_gate(X86_TRAP_OF, (uint32_t)isr_overflow);
+    set_interrupt_gate(X86_TRAP_BR, (uint32_t)isr_boundrange);
+    set_interrupt_gate(X86_TRAP_UD, (uint32_t)isr_invalid_opcode);
+    set_interrupt_gate(X86_TRAP_NM, (uint32_t)isr_device_not_available);
+    set_interrupt_gate(X86_TRAP_DF, (uint32_t)isr_double_fault);
+    set_interrupt_gate(X86_TRAP_OLD_MF, (uint32_t)isr_segment_overrun);
+    set_interrupt_gate(X86_TRAP_TS, (uint32_t)isr_invalid_tss);
+    set_interrupt_gate(X86_TRAP_NP, (uint32_t)isr_segment_not_present);
+    set_interrupt_gate(X86_TRAP_SS, (uint32_t)isr_stack_segment_fault);
+    set_interrupt_gate(X86_TRAP_GP, (uint32_t)isr_general_protection);
+    set_interrupt_gate(X86_TRAP_PF, (uint32_t)isr_page_fault);
+    set_interrupt_gate(X86_TRAP_INTEL_RES, (uint32_t)isr_reserved_15);
+    set_interrupt_gate(X86_TRAP_MF, (uint32_t)isr_fpe);
+    set_interrupt_gate(X86_TRAP_AC, (uint32_t)isr_alignment_check);
+    set_interrupt_gate(X86_TRAP_MC, (uint32_t)isr_machine_check);
+    set_interrupt_gate(X86_TRAP_XF, (uint32_t)isr_simd_fpe);
+    set_system_interrupt_gate(SYSCALL_VECTOR, (uint32_t)isr_syscall);
+
+    /* IRQs */
+    // set_interrupt_gate(X86_IRQ0, (uint32_t)IRQ0);
+    // set_interrupt_gate(X86_IRQ1, (uint32_t)IRQ1);
+    // set_interrupt_gate(X86_IRQ2, (uint32_t)IRQ2);
+    // set_interrupt_gate(X86_IRQ3, (uint32_t)IRQ3);
+    // set_interrupt_gate(X86_IRQ4, (uint32_t)IRQ4);
+    // set_interrupt_gate(X86_IRQ5, (uint32_t)IRQ5);
+    // set_interrupt_gate(X86_IRQ6, (uint32_t)IRQ6);
+    // set_interrupt_gate(X86_IRQ7, (uint32_t)IRQ7);
+    // set_interrupt_gate(X86_IRQ8, (uint32_t)IRQ8);
+    // set_interrupt_gate(X86_IRQ9, (uint32_t)IRQ9);
+    // set_interrupt_gate(X86_IRQ10, (uint32_t)IRQ10);
+    // set_interrupt_gate(X86_IRQ11, (uint32_t)IRQ11);
+    // set_interrupt_gate(X86_IRQ12, (uint32_t)IRQ12);
+    // set_interrupt_gate(X86_IRQ13, (uint32_t)IRQ13);
+    // set_interrupt_gate(X86_IRQ14, (uint32_t)IRQ14);
+    // set_interrupt_gate(X86_IRQ15, (uint32_t)IRQ15);
 
     set_idt_descriptor();
-}
-
-char *ISR_EXCEPTION_MESSAGE[] = {
-    "Division By Zero",
-    "Debug",
-    "Non Maskable Interrupt",
-    "Breakpoint",
-    "Into Detected Overflow",
-    "Out of Bounds",
-    "Invalid Opcode",
-    "No Coprocessor",
-    "Double Fault",
-    "Coprocessor Segment Overrun",
-    "Bad TSS",
-    "Segment Not Present",
-    "Stack Fault",
-    "General Protection Fault",
-    "Page Fault",
-    "Unknown Interrupt",
-    "Coprocessor Fault",
-    "Alignment Check",
-    "Machine Check",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved"
-    ""
-};
-
-void isr_handler(registers_t regs)
-{
-    kprint("Received interrupt: ");
-    char s[3];
-    int_to_ascii(regs.int_number, s);
-    kprint(s);
-    kprint("\n");
-    kprint(ISR_EXCEPTION_MESSAGE[regs.int_number]);
-    kprint("\n");
 }
