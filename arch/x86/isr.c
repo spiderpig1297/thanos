@@ -8,40 +8,40 @@
 
 void isr_install()
 {
-    init_idt_entry(0, (uint32_t)isr0);
-    init_idt_entry(1, (uint32_t)isr1);
-    init_idt_entry(2, (uint32_t)isr2);
-    init_idt_entry(3, (uint32_t)isr3);
-    init_idt_entry(4, (uint32_t)isr4);
-    init_idt_entry(5, (uint32_t)isr5);
-    init_idt_entry(6, (uint32_t)isr6);
-    init_idt_entry(7, (uint32_t)isr7);
-    init_idt_entry(8, (uint32_t)isr8);
-    init_idt_entry(9, (uint32_t)isr9);
-    init_idt_entry(10, (uint32_t)isr10);
-    init_idt_entry(11, (uint32_t)isr11);
-    init_idt_entry(12, (uint32_t)isr12);
-    init_idt_entry(13, (uint32_t)isr13);
-    init_idt_entry(14, (uint32_t)isr14);
-    init_idt_entry(15, (uint32_t)isr15);
-    init_idt_entry(16, (uint32_t)isr16);
-    init_idt_entry(17, (uint32_t)isr17);
-    init_idt_entry(18, (uint32_t)isr18);
-    init_idt_entry(19, (uint32_t)isr19);
-    init_idt_entry(20, (uint32_t)isr20);
-    init_idt_entry(21, (uint32_t)isr21);
-    init_idt_entry(22, (uint32_t)isr22);
-    init_idt_entry(23, (uint32_t)isr23);
-    init_idt_entry(24, (uint32_t)isr24);
-    init_idt_entry(25, (uint32_t)isr25);
-    init_idt_entry(26, (uint32_t)isr26);
-    init_idt_entry(27, (uint32_t)isr27);
-    init_idt_entry(28, (uint32_t)isr28);
-    init_idt_entry(29, (uint32_t)isr29);
-    init_idt_entry(30, (uint32_t)isr30);
-    init_idt_entry(31, (uint32_t)isr31);
+    set_idt_gate(0, (uint32_t)isr_divide_by_zero);
+    set_idt_gate(1, (uint32_t)isr_debug);
+    set_idt_gate(2, (uint32_t)isr_nmi);
+    set_idt_gate(3, (uint32_t)isr_breakpoint);
+    set_idt_gate(4, (uint32_t)isr_overflow);
+    set_idt_gate(5, (uint32_t)isr5);
+    set_idt_gate(6, (uint32_t)isr6);
+    set_idt_gate(7, (uint32_t)isr7);
+    set_idt_gate(8, (uint32_t)isr8);
+    set_idt_gate(9, (uint32_t)isr9);
+    set_idt_gate(10, (uint32_t)isr10);
+    set_idt_gate(11, (uint32_t)isr11);
+    set_idt_gate(12, (uint32_t)isr12);
+    set_idt_gate(13, (uint32_t)isr13);
+    set_idt_gate(14, (uint32_t)isr14);
+    set_idt_gate(15, (uint32_t)isr15);
+    set_idt_gate(16, (uint32_t)isr16);
+    set_idt_gate(17, (uint32_t)isr17);
+    set_idt_gate(18, (uint32_t)isr18);
+    set_idt_gate(19, (uint32_t)isr19);
+    set_idt_gate(20, (uint32_t)isr20);
+    set_idt_gate(21, (uint32_t)isr21);
+    set_idt_gate(22, (uint32_t)isr22);
+    set_idt_gate(23, (uint32_t)isr23);
+    set_idt_gate(24, (uint32_t)isr24);
+    set_idt_gate(25, (uint32_t)isr25);
+    set_idt_gate(26, (uint32_t)isr26);
+    set_idt_gate(27, (uint32_t)isr27);
+    set_idt_gate(28, (uint32_t)isr28);
+    set_idt_gate(29, (uint32_t)isr29);
+    set_idt_gate(30, (uint32_t)isr30);
+    set_idt_gate(31, (uint32_t)isr31);
 
-    init_idt_descriptor();
+    set_idt_descriptor();
 }
 
 char *ISR_EXCEPTION_MESSAGE[] = {
@@ -53,7 +53,6 @@ char *ISR_EXCEPTION_MESSAGE[] = {
     "Out of Bounds",
     "Invalid Opcode",
     "No Coprocessor",
-
     "Double Fault",
     "Coprocessor Segment Overrun",
     "Bad TSS",
@@ -62,7 +61,6 @@ char *ISR_EXCEPTION_MESSAGE[] = {
     "General Protection Fault",
     "Page Fault",
     "Unknown Interrupt",
-
     "Coprocessor Fault",
     "Alignment Check",
     "Machine Check",
@@ -71,7 +69,6 @@ char *ISR_EXCEPTION_MESSAGE[] = {
     "Reserved",
     "Reserved",
     "Reserved",
-
     "Reserved",
     "Reserved",
     "Reserved",

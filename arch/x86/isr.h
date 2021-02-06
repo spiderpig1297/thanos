@@ -2,11 +2,11 @@
 
 #include "types.h"
 
-extern void isr0();
-extern void isr1();
-extern void isr2();
-extern void isr3();
-extern void isr4();
+extern void isr_divide_by_zero();
+extern void isr_debug();
+extern void isr_nmi();
+extern void isr_breakpoint();
+extern void isr_overflow();
 extern void isr5();
 extern void isr6();
 extern void isr7();
@@ -40,7 +40,7 @@ typedef struct {
     uint32_t eax, ebx, ecx, edx, edi, esi, ebp, esp;    // General purpose registers. Pushed by pusha.
     uint32_t int_number, err_code;                      // Interrupt number and error code.
     uint32_t eip, cs, eflags, useresp, ss;              // Pushed automatically by the CPU.
-} __attribute__((packed)) registers_t;  
+} registers_t;  
 
 void isr_install();
 void isr_handler(registers_t regs);
