@@ -8,11 +8,8 @@ mov sp, bp
 
 mov bx, MSG_REAL_MODE
 call print_string
-
 call load_kernel    ; Load our kernel.
-
 call switch_to_pm
-
 jmp $
 
 %include "boot/16bit_print.asm"
@@ -22,7 +19,6 @@ jmp $
 %include "boot/switch_pm.asm"
 
 [bits 16]
-
 load_kernel:
     pusha
 
@@ -35,16 +31,13 @@ load_kernel:
     call disk_load
     
     popa
-
     ret
 
 [bits 32]
 BEGIN_PM:
     mov ebx, MSG_PROT_MODE
     call print_string_pm
-    
     call KERNEL_OFFSET
-
     jmp $
 
 ; Global variables

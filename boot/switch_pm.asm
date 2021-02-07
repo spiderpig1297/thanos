@@ -9,7 +9,6 @@ switch_to_pm:
 
     jmp CODE_SEG:start_protected_mode
 
-
 [bits 32]
 start_protected_mode:
     ; By now - we are in protected mode!
