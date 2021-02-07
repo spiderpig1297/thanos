@@ -21,39 +21,40 @@ typedef struct {
     uint32_t offset_in_frame;
 } frame_info_t;
 
-static void fill_frame_info(uint32_t frame_address, frame_info_t* frame_info)
+
+void alloc_frame(page_t* page, uint8_t kernel, uint8_t writable)
 {
-    uint32_t frame_number = frame_address / PAGESIZE;
-    frame_info->frame_number = frame_number;
-    frame_info->frame_index_in_bitmap = FRAME_INDEX_IN_BITMAP(frame_number);
-    frame_info->offset_in_frame = offset_in_frame(frame_number);
+    if (NULL != page->frame_address) {
+        // Frame is already allocated!
+        return;
+    }
+
+    uint32_t index = find_first_available_frame();
+    if (-ENOTFOUND == (int32_t)index) {
+        PANIC("Failed to allocate frame - not available frames.");
+    }
+
+    // Mark the frame as allocated.
+    _set_frame(index);
+
+    page->present = 1;
+    page->usermode = kernel ? 0 : 1;
+    page->writable = writable ? 1 : 0;
+    page->frame_address = index;
 }
 
-static void set_frame(uint32_t frame_address)
+void free_frame(page_t* page)
 {
-    frame_info_t frame_info  = { 0 };
-    fill_frame_info(frame_address, &frame_info);
-    bitmap_set( &frames[frame_info.frame_index_in_bitmap], 
-                frame_info.offset_in_frame);
+    uint32_t frame = page->frame_address;
+    if (!frame) {
+        // Nothing to free.
+        return;
+    }
+
+    _clear_frame(frame);
 }
 
-static void clear_frame(uint32_t frame_address)
-{
-    frame_info_t frame_info  = { 0 };
-    fill_frame_info(frame_address, &frame_info);
-    bitmap_clear(&frames[frame_info.frame_index_in_bitmap], 
-                 frame_info.offset_in_frame);
-}
-
-static uint32_t test_frame(uint32_t frame_address)
-{
-    frame_info_t frame_info  = { 0 };
-    fill_frame_info(frame_address, &frame_info);
-    return bitmap_test( &frames[frame_info.frame_index_in_bitmap], 
-                        frame_info.offset_in_frame);
-}
-
-static int find_first_available_frame(uint32_t available_frame)
+static uint32_t find_first_available_frame()
 {
     int frame_index, offset_in_frame = 0;
     for (frame_index = 0; frame_index < frames_number; ++frame_index) {
@@ -69,5 +70,37 @@ static int find_first_available_frame(uint32_t available_frame)
         }
     }
 
-    
+    return -ENOTFOUND;
+}
+
+static void _fill_frame_info(uint32_t frame_address, frame_info_t* frame_info)
+{
+    uint32_t frame_number = frame_address / PAGESIZE;
+    frame_info->frame_number = frame_number;
+    frame_info->frame_index_in_bitmap = FRAME_INDEX_IN_BITMAP(frame_number);
+    frame_info->offset_in_frame = offset_in_frame(frame_number);
+}
+
+static void _set_frame(uint32_t frame_address)
+{
+    frame_info_t frame_info  = { 0 };
+    _fill_frame_info(frame_address, &frame_info);
+    bitmap_set( &frames[frame_info.frame_index_in_bitmap], 
+                frame_info.offset_in_frame);
+}
+
+static void _clear_frame(uint32_t frame_address)
+{
+    frame_info_t frame_info  = { 0 };
+    _fill_frame_info(frame_address, &frame_info);
+    bitmap_clear(&frames[frame_info.frame_index_in_bitmap], 
+                 frame_info.offset_in_frame);
+}
+
+static uint32_t _test_frame(uint32_t frame_address)
+{
+    frame_info_t frame_info  = { 0 };
+    _fill_frame_info(frame_address, &frame_info);
+    return bitmap_test( &frames[frame_info.frame_index_in_bitmap], 
+                        frame_info.offset_in_frame);
 }
