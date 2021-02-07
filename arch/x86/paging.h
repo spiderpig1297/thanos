@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.h"
+#include "kernel-generic.h"
 #include "registers.h"
 
 #define __NR_pages (1024)
