@@ -4,7 +4,7 @@
 
 typedef uint32_t bitmap_t;
 
-void bitmap_set(bitmap_t* b, uint8_t i, uint8_t v)
+void bitmap_set(bitmap_t* b, uint8_t i)
 {
     *b |= (0x1 << i);
 }
