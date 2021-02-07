@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.h"
+#include "kernel-generic.h"
 
 typedef uint32_t bitmap_t;
 
@@ -19,3 +19,7 @@ void bitmap_clear(bitmap_t* b, uint8_t i)
     *b &= ~(0x1 << i); 
 }
 
+uint8_t is_bitmap_full(const bitmap_t* b)
+{
+    return 0xFFFFFFFF == *b;
+}

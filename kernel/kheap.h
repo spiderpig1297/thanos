@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.h"
+#include "kernel-generic.h"
 
 #define PAGESIZE (4096)
 
