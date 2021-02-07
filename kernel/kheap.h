@@ -2,6 +2,7 @@
 
 #include "kernel-generic.h"
 
+#define MEMORY_LIMIT (0x1000000)    // 16MB
 #define PAGESIZE (4096)
 
 #define IS_ADDRESS_ALIGNED(address, boundary) !(address & (boundary - 1))

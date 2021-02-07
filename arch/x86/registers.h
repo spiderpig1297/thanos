@@ -9,27 +9,11 @@ typedef struct {
     uint32_t eip, cs, eflags, useresp, ss;              // Pushed automatically by the CPU.
 } registers_t;  
 
-#define _DEFINE_CRX_GETTER(n)                                   \
-    uint32_t inline get_cr##n() {                               \
-        uint32_t cr##n;                                         \
-        __asm__ __volatile__("mov %%cr##n, %0" : "=r" (cr##n)); \
-        return cr##n;                                           \
-    }                                                           \
+uint32_t get_cr0();
+void set_cr0();
 
-#define _DEFINE_CRX_SETTER(n)                                   \
-    void inline set_cr##n(uint32_t val)                         \
-    {                                                           \
-        __asm__ __volatile__("mov %0, %%cr##n" :: "r" (val));   \
-    }                                                           \
+uint32_t get_cr2();
+void set_cr2();
 
-// Define getter and setter for CR0.
-_DEFINE_CRX_GETTER(0);
-_DEFINE_CRX_GETTER(0);
-
-// Define getter and setter for CR2.
-_DEFINE_CRX_GETTER(2);
-_DEFINE_CRX_GETTER(2);
-
-// Define getter and setter for CR3.
-_DEFINE_CRX_GETTER(3);
-_DEFINE_CRX_SETTER(3);
+uint32_t get_cr3();
+void set_cr3();

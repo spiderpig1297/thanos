@@ -1,6 +1,6 @@
 #include "kheap.h"
 
-#include "../../arch/x86/paging.h"  // TODO: what if there will be another arch?
+#include "../arch/x86/paging.h"  // TODO: what if there will be another arch?
 
 #define ALIGN       (1)
 #define NOALIGN     (0)

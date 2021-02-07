@@ -1,18 +1,26 @@
 #include "../drivers/screen.h"
 #include "util.h"
 #include "../arch/x86/idt.h"
+#include "../arch/x86/paging.h"
 #include "../arch/x86/isr.h"
 #include "../arch/x86/timer.h"
 
-void main() {
+int main() 
+{
     kclear_screen();
 
     kprint("Kernel started!\n");
 
     enable_interrupts();
     
-    init_idt();
-    init_timer(50);
+    /* No need to init the GDT as the bootsector already did */
 
-    __asm__ __volatile__("int $32");
+    init_idt();
+
+    init_paging();
+
+    uint32_t* ptr = (uint32_t*)0xA0000000;
+    uint32_t do_page_fault = *ptr;
+
+    return 0;
 }

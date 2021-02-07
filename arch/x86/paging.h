@@ -1,7 +1,8 @@
 #pragma once
 
-#include "kernel-generic.h"
+#include "../../kernel/kernel-generic.h"
 #include "registers.h"
+#include "../../kernel/util.h"
 
 #define __NR_pages (1024)
 
@@ -48,7 +49,11 @@ void switch_page_directory(page_directory_t* new_pgd);
  */
 page_t* get_page(uint32_t address, uint8_t create, page_directory_t* pgdt);
 
+void alloc_frame(page_t* page, uint8_t kernel, uint8_t writable);
+void free_frame(page_t* page);
+
 /**
  * Handler for page faults.
  */
 void page_fault_handler(registers_t registers);
+
