@@ -44,7 +44,7 @@ static uint32_t find_first_available_frame()
         }
 
         for (offset_in_frame = 0; offset_in_frame < sizeof(bitmap_t); ++offset_in_frame) {
-            if (bitmap_test(frames[frame_index], offset_in_frame)) {
+            if (!bitmap_test(frames[frame_index], offset_in_frame)) {
                 return frame_index * sizeof(bitmap_t) + offset_in_frame;
             }    
         }
@@ -56,8 +56,7 @@ static uint32_t find_first_available_frame()
 static void _enable_paging()
 {
     uint32_t cr0 = get_cr0();
-    __asm__ __volatile__("mov %0, %%cr0" :: "r" (cr0 | 0x80000000));
-    // set_cr0(cr0 | 0x80000000);
+    set_cr0(cr0 | 0x80000000);
 }
 
 static void _fill_frame_info(uint32_t frame_address, frame_info_t* frame_info)
@@ -127,10 +126,7 @@ void free_frame(page_t* page)
 
 void init_paging()
 {
-    // Size of physical memory. for now - assume it is 16MB.
-    uint32_t memory_limit = MEMORY_LIMIT;
-
-    frames_number = memory_limit / PAGESIZE;
+    frames_number = MEMORY_LIMIT / PAGESIZE;
     uint32_t frames_bitmap_size = FRAME_INDEX_IN_BITMAP(frames_number);
     frames = (uint32_t*)kmalloc(frames_bitmap_size);
     memzero(frames, frames_bitmap_size);
@@ -147,10 +143,12 @@ void init_paging()
     // by calling kmalloc(). A while loop causes this to be
     // computed on-the-fly rather than once at the start.
     int i = 0;
-    for (i = 0; i < placement_address; i += PAGESIZE)
-    {
+    while (i < placement_address)
+    {        
+        kprint_dec((uint32_t)placement_address);
         // Kernel code is readable but not writeable from userspace.
         alloc_frame( get_page(i, 1, kernel_pgd), 0, 0);
+        i += 0x1000;
     }
 
     register_interrupt_handler(X86_TRAP_PF, page_fault_handler);

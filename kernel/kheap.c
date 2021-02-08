@@ -9,7 +9,7 @@ uint32_t placement_address = 0;
 
 uint32_t align_address(uint32_t address, uint32_t boundary)
 {
-    return (address & (boundary - 1)) ? (address & (~(boundary - 1)) + boundary): address; 
+    return (address & (boundary - 1)) ? (address & ~(boundary - 1)) + boundary : address; 
 }
 
 uint32_t kmalloc(uint32_t len)
